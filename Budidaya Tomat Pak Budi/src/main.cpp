@@ -93,6 +93,10 @@ void loop() {
   penyiraman();
   Blynk.run();
   timer.run();
+  
+  if(rain_status == "Hujan"){
+    delayOneDay();
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,8 +149,6 @@ void rain(){
   rain_value = digitalRead(RAIN_PIN);
   if(rain_value <= LOW){
     rain_status = "Hujan";
-    delay(5000);
-    delayOneDay();
   }else{
     rain_status = "Cerah";
   }
@@ -204,8 +206,8 @@ void sendData1(){
     Serial.printf("Temperature: %0.2f\n", temp);
     Blynk.virtualWrite(V0, temp); 
 
-    Serial.printf("Relay Value: %d  \n", RELAYPIN);
-    Blynk.virtualWrite(V4, relayPin); 
+    Serial.printf("Relay Value: %d  \n", relayPin);
+    // Blynk.virtualWrite(V4, relayPin); 
 
     Serial.printf("Rain status: %s\n", rain_status);
     Blynk.virtualWrite(V3, rain_status);
