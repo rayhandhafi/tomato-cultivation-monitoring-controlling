@@ -14,7 +14,6 @@
 
 
 
-//#define RAIN_PIN 25
 #define TEMP_PIN 25                          
 //#define RELAY_PIN 32
 //#define SCHED_PIN 33
@@ -23,9 +22,7 @@
 #define RELAY_PIN 15
 #define SCHED_PIN 33
 #define DHTTYPE DHT22
-#define TEMP_BLYNK_VPIN V0
-#define RAIN_BLYNK_VPIN V3
-#define IRRG_BLYNK_VPIN V1
+
 
 
 // calculate debit water
@@ -44,108 +41,71 @@ int rain_value =0;
 float banyakAir=0;
 float water_out=0;
 int relayPin=0;
-int temp=0;
+float temp=0.0;
 int schedPin = 0;
 int hour=0;
 int minute=0;
 int second=0;
-
-// Rain Module variables
-int RAIN;
-// DHT related variables
-float hic;
-
-BLYNK_WRITE(V4){
-  int pin=param.asInt();
-  digitalWrite(RELAY_PIN,pin);
-}
-BLYNK_WRITE(V2){
-  int pin=param.asInt();
-  schedPin=pin;
-}
+String rain_status;
 
 
 //Week Days
 String weekDays[7]={"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
-//void time(); 
-//void temperature();
-//void rain();
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+void time(); 
+void temperature();
+void rain();
 void schedule();
 void penyiraman();
 void delayOneDay();
-//void sendRainData();
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-void temperature(){              // Pembacaan 
-  temp = analogRead(TEMP_PIN);      
-  relayPin = digitalRead(RELAY_PIN);
-  // Serial.printf("Moisture value: %d,\tPersen tanah: %d \n",soil_value, persen_tanah)
-  if (temp < 27) {
-    digitalWrite(RELAY_PIN, HIGH);
-  } else if (temp > 30) {
-    digitalWrite(RELAY_PIN, LOW);
-  }
-}
+void sendData1();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-void sendRainData() {
-  Serial.println("Sending Rain data");
-  Blynk.virtualWrite(TEMP_BLYNK_VPIN, RAIN);
-}
 
-void sendIrrigationData(){
-  Serial.println("Sending Irrigation Data");
-  Blynk.virtualWrite(IRRG_BLYNK_VPIN, water_out);
-}
-void rain(){              // Pembacaan rain sensor
-  rain_value = digitalRead(RAIN_PIN);
-  RAIN = rain_value;
-  if(rain_value == LOW){
-    Serial.println("Oh! It's Raining...\n");
-    digitalWrite(RELAY_PIN, HIGH);
-    sendRainData();
-    delay(3000);
-    delayOneDay();
-    }else{
-      sendRainData();
-    }
-}
 
-void delayOneDay(){
-  Serial.println("Delaying one day...");
-  delay( 86400000 );
-}
-
-void sendDhtData() {
-  Serial.println("Sending DHT data");
-  Blynk.virtualWrite(TEMP_BLYNK_VPIN, hic);
-}
-
-void readAndSendDhtData() {
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
-  relayPin = digitalRead(RELAY_PIN); 
-  if (isnan(h) || isnan(t)) {
-  Serial.println(F("Failed to read from DHT sensor!"));
-  return;
+void setup(){
+  Serial.begin(115200);
+  pinMode(TEMP_PIN, INPUT);
+  pinMode(RAIN_PIN, INPUT);
+  pinMode(RELAY_PIN, OUTPUT);
+  WiFi.begin(ssid, password);
+  while ( WiFi.status() != WL_CONNECTED ) {
+    delay ( 500 );
+    Serial.print ( "." );
   }
-  float hic = dht.computeHeatIndex(t, h, false);
-  Serial.print(hic);
-  Serial.print(F("°C "));
-  if (hic < 27) {
-    digitalWrite(RELAY_PIN, HIGH);
-  } else if (hic > 30) {
-    digitalWrite(RELAY_PIN, LOW);
-  };
-  sendDhtData();
+  dht.begin();
+  Serial.println("DHT startup!");
+  timeClient.begin();  
+  Blynk.begin(BLYNK_AUTH_TOKEN,ssid, password);
+  timer.setInterval(1000L, sendData1);
 }
 
-void reandAndSendSensorsData() {
-  readAndSendDhtData();
+void loop() { 
+  if(relayPin == 0){
+    time(); 
+  }
+  time(); 
+  temperature();
   rain();
-  sendIrrigationData();
-  Serial.println("Sending data from sensors");
+  schedule();
+  penyiraman();
+  Blynk.run();
+  timer.run();
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+BLYNK_WRITE(V2){
+   schedPin = param.asInt();
+} 
+
+BLYNK_WRITE(V4){
+   relayPin = param.asInt();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void time(){
   timeClient.update();
@@ -159,17 +119,63 @@ void time(){
   int currentSecond = timeClient.getSeconds();
   String weekDay = weekDays[timeClient.getDay()];
   Serial.printf("Day, Hour:Minutes:Seconds  ->  %s,\t%d:%d:%d \n", weekDay, currentHour, currentMinute, currentSecond);
+}
+
+void temperature() {
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  if (isnan(h) || isnan(t)) {
+  Serial.println(F("Failed to read from DHT sensor!"));
+  return;
   }
+  temp = dht.computeHeatIndex(t, h, false);
+//   Serial.print(temp);
+//   Serial.print(F("°C "));
+  if (temp < 27) {
+    relayPin = 1;
+  } else if (temp > 30) {
+    relayPin = 0;
+  };
+}
+
+
+void rain(){              
+  // Pembacaan rain sensor
+  rain_value = digitalRead(RAIN_PIN);
+  if(rain_value <= LOW){
+    rain_status = "Hujan";
+    delayOneDay();
+  }else{
+    rain_status = "Cerah";
+  }
+
+}
+
+void schedule(){
+  int currentHour = timeClient.getHours();
+  int currentMinute = timeClient.getMinutes();
+  int currentSecond = timeClient.getSeconds();
+  if(schedPin == 1){
+    // Serial.println("Scheduling Status: ON");
+    if (currentHour == hour && currentMinute == minute && currentSecond == second){
+      relayPin = 1;
+    }
+    else if (currentHour == hour && currentMinute == minute && currentSecond == second+3){
+      relayPin = 0;
+    }
+  }
+//   else{
+//     Serial.println("Scheduling Status: OFF");
+//   }
+}
 
 void penyiraman(){
   int relayPin = digitalRead(RELAY_PIN);
   float banyakAir;
   float banyakAir_new = 0.0;
   float water_out;
-  //int schedSwitch = digitalRead(SCHED_PIN);
   // Baca sensor untuk mendeteksi awal penggunaan
-  // Baca sensor untuk mendeteksi awal penggunaan
-  if (relayPin == HIGH) {
+  if (relayPin == 1) {
     delay(1000);  // Penghitungan detik penyiram menyala
     activeTime++;
   }
@@ -178,66 +184,33 @@ void penyiraman(){
    Serial.printf("Debit air: %.2f\n", banyakAir);
 
   // Baca sensor untuk mendeteksi akhir penggunaan
-  if (relayPin == LOW) {
+  if (relayPin == 0) {
     water_out = banyakAir + banyakAir_new;
     banyakAir_new = banyakAir;
   }
 }
 
-void schedule(){
-  int currentHour = timeClient.getHours();
-  int currentMinute = timeClient.getMinutes();
-  int currentSecond = timeClient.getSeconds();
-  int schedSwitch = digitalRead(SCHED_PIN);
-  if(schedPin == 1){
-    Serial.println("Scheduling started...");
-    if (currentHour == hour && currentMinute == minute && currentSecond == second){
-      digitalWrite(RELAY_PIN, HIGH);
-    }
-    else if (currentHour == hour && currentMinute == minute && currentSecond == second+3){
-      digitalWrite(RELAY_PIN, LOW);
-    }
-  }
+void delayOneDay(){
+  Serial.println("Delaying one day...");
+  delay( 86400000 );
 }
 
-// BLYNK_WRITE(V3){
-//   int data = param.asInt();
-//   digitalWrite(RELAY_PIN, data);
-// } 
+void sendData1(){
+    Serial.println("\n//////////////////////////////////////////////////////////////////////////////////////////////////////");
+    Serial.println("Send data \n"); 
 
-void setup(){
-  Serial.begin(115200);
-  pinMode(TEMP_PIN, INPUT);
-  //pinMode(SCHED_PIN, INPUT);
-  pinMode(RAIN_PIN, INPUT);
-  pinMode(RELAY_PIN, OUTPUT);
-  WiFi.begin(ssid, password);
-  while ( WiFi.status() != WL_CONNECTED ) {
-    delay ( 500 );
-    Serial.print ( "." );
-  }
-  Serial.println("DHT startup!");
-  dht.begin();
-  //setupDht();
-  timeClient.begin();  
-  Blynk.begin(BLYNK_AUTH_TOKEN,ssid, password);
-  //timer.setInterval(5000L, sendData1);
-  //timer.setInterval(1000L, reandAndSendSensorsData);
-}
+    Serial.printf("Temperature: %0.2f\n", temp);
+    Blynk.virtualWrite(V0, temp); 
 
-void loop() { 
-  //Blynk.virtualWrite(TEMP_BLYNK_VPIN, hic);
-  //Blynk.virtualWrite(HUMID_BLYNK_VPIN, h);
-  /*f(relayPin == LOW){
-    time(); 
-  }*/
-  reandAndSendSensorsData();
-  //temperature();
-  //int sched = digitalRead(SCHED_PIN);
-  //Serial.printf("Penyiram: %d \n",sched);
-  schedule();
-  penyiraman();
-  Blynk.run();
-  timer.run();
-  // delay(1000); //udah kena delay dari fungsi time
+    Serial.printf("Relay Value: %d  \n", relayPin);
+    Blynk.virtualWrite(V4, relayPin); 
+
+    Serial.printf("Rain status: %s\n", rain_status);
+    Blynk.virtualWrite(V3, rain_value);
+
+    Serial.printf("Sched_Pin status: %d\n", schedPin);
+
+    Serial.printf("Banyak Air status: %0.2f\n", water_out);
+    Blynk.virtualWrite(V1, water_out);
+
 }
