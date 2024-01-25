@@ -40,6 +40,7 @@ const char *password = "12345678";
 int rain_value =0;
 float banyakAir=0;
 float water_out=0;
+int RELAYPIN=0;
 int relayPin=0;
 float temp=0.0;
 int schedPin = 0;
@@ -102,7 +103,7 @@ BLYNK_WRITE(V2){
 } 
 
 BLYNK_WRITE(V4){
-   relayPin = param.asInt();
+   RELAYPIN = param.asInt();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,6 +145,7 @@ void rain(){
   rain_value = digitalRead(RAIN_PIN);
   if(rain_value <= LOW){
     rain_status = "Hujan";
+    delay(5000);
     delayOneDay();
   }else{
     rain_status = "Cerah";
@@ -181,7 +183,7 @@ void penyiraman(){
   }
 
    banyakAir = (activeTime) * literPerDetik;  // Hitung banyaknya air dalam liter
-   Serial.printf("Debit air: %.2f\n", banyakAir);
+   // Serial.printf("Debit air: %.2f\n", banyakAir);
 
   // Baca sensor untuk mendeteksi akhir penggunaan
   if (relayPin == 0) {
@@ -202,7 +204,7 @@ void sendData1(){
     Serial.printf("Temperature: %0.2f\n", temp);
     Blynk.virtualWrite(V0, temp); 
 
-    Serial.printf("Relay Value: %d  \n", relayPin);
+    Serial.printf("Relay Value: %d  \n", RELAYPIN);
     Blynk.virtualWrite(V4, relayPin); 
 
     Serial.printf("Rain status: %s\n", rain_status);
