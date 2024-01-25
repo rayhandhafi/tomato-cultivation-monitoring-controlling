@@ -148,12 +148,11 @@ void temperature() {
   if (temp > 40) {
     relayPin = 1;
     digitalWrite(RELAY_PIN,HIGH);
-  } else if (temp == 36) {
+  } else if ((temp <= 36)&&(temp >=35.99)) {
     relayPin = 0;
     digitalWrite(RELAY_PIN,LOW);
   }
 }
-
 
 void rain(){              
   // Pembacaan rain sensor
