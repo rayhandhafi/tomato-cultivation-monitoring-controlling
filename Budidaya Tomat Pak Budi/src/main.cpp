@@ -145,13 +145,13 @@ void temperature() {
   temp = dht.computeHeatIndex(t, h, false);
 //   Serial.print(temp);
 //   Serial.print(F("°C "));
-  // if (temp > 40) {
-  //   relayPin = 1;
-  //   digitalWrite(RELAY_PIN,HIGH);
-  // } else if (temp < 36) {
-  //   relayPin = 0;
-  //   digitalWrite(RELAY_PIN,LOW);
-  // }
+  if (temp > 40) {
+    relayPin = 1;
+    digitalWrite(RELAY_PIN,HIGH);
+  } else if (temp == 36) {
+    relayPin = 0;
+    digitalWrite(RELAY_PIN,LOW);
+  }
 }
 
 
