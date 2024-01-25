@@ -45,9 +45,9 @@ int relayPin=0;
 float temp=0.0;
 int schedPin = 0;
 String rain_status;
-int currentHour 
-int currentMinute 
-int currentSecond 
+int currentHour;
+int currentMinute; 
+int currentSecond;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Ubah jam
