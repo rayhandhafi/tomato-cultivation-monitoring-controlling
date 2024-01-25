@@ -128,7 +128,7 @@ void time(){
   int currentMinute = timeClient.getMinutes();
   int currentSecond = timeClient.getSeconds();
   String weekDay = weekDays[timeClient.getDay()];
-  // Serial.printf("Day, Hour:Minutes:Seconds  ->  %s,\t%d:%d:%d \n", weekDay, currentHour, currentMinute, currentSecond);
+  Serial.printf("Day, Hour:Minutes:Seconds  ->  %s,\t%d:%d:%d \n", weekDay, currentHour, currentMinute, currentSecond);
 }
 
 void temperature() {
@@ -173,7 +173,7 @@ void schedule(){
       relayPin = 1;
       digitalWrite(RELAY_PIN,HIGH);
     }
-    else if (currentHour == hour && currentMinute == minute && currentSecond == second+3){
+    else if (currentHour == hour && currentMinute == minute && currentSecond == second+10){
       relayPin = 0;
       digitalWrite(RELAY_PIN,LOW);
     }
