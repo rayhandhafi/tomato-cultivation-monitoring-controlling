@@ -193,7 +193,6 @@ void penyiraman(){
 
   // Baca sensor untuk mendeteksi awal penggunaan
   if (relayPin == 1) {
-    relay_status = "ON";
     delay(1000);  // Penghitungan detik penyiram menyala
     ++activeTime;
   }
@@ -204,7 +203,6 @@ void penyiraman(){
 
   // Baca sensor untuk mendeteksi akhir penggunaan
   if (relayPin == 0) {
-    relay_status = "OFF";
     water_out += banyakAir;
 
     // Tampilkan hasil pada monitor serial
