@@ -95,6 +95,7 @@ void loop() {
   timer.run();
   
   if(rain_status == "Hujan"){
+    delay(3000);
     delayOneDay();
   }
 }
@@ -136,10 +137,10 @@ void temperature() {
   temp = dht.computeHeatIndex(t, h, false);
 //   Serial.print(temp);
 //   Serial.print(F("°C "));
-  if (temp < 27) {
-    relayPin = 1;
-  } else if (temp > 30) {
-    relayPin = 0;
+  // if (temp < 27) {
+  //   relayPin = 1;
+  // } else if (temp > 30) {
+  //   relayPin = 0;
   };
 }
 
@@ -149,6 +150,7 @@ void rain(){
   rain_value = digitalRead(RAIN_PIN);
   if(rain_value <= LOW){
     rain_status = "Hujan";
+    delay(3000);
   }else{
     rain_status = "Cerah";
   }
