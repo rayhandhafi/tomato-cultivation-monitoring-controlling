@@ -48,7 +48,6 @@ int hour=0;
 int minute=0;
 int second=0;
 String rain_status;
-float banyakAir_new = 0.0;
 
 
 
@@ -183,21 +182,32 @@ void schedule(){
 
 void penyiraman(){
   // Baca sensor untuk mendeteksi awal penggunaan
-  if (relayPin == 1) {
-    digitalWrite(RELAY_PIN,HIGH);
-    delay(1000);  // Penghitungan detik penyiram menyala
-    activeTime++;
-  }
+  float banyakAir_new = 0.0;
+  
+  int currentHour = timeClient.getHours();
+  int currentMinute = timeClient.getMinutes();
+  int currentSecond = timeClient.getSeconds();
 
-   banyakAir = (activeTime) * literPerDetik;  // Hitung banyaknya air dalam liter
+  // Baca sensor untuk mendeteksi awal penggunaan
+  if (relayPin == 1) {
+    relay_status = "ON";
+    delay(1000);  // Penghitungan detik penyiram menyala
+    ++activeTime;
+  }
+  
+  // Hitung banyaknya air dalam liter
+   banyakAir = activeTime * literPerDetik;  
    Serial.printf("Debit air: %.2f\n", banyakAir);
 
   // Baca sensor untuk mendeteksi akhir penggunaan
   if (relayPin == 0) {
-    water_out = banyakAir + banyakAir_new;
-    banyakAir_new = banyakAir;
+    relay_status = "OFF";
+    water_out += banyakAir;
+
+    // Tampilkan hasil pada monitor serial
+    // Serial.printf("Banyaknya Air yang Keluar: %.6f Liter", water_out);
     activeTime = 0;
-    digitalWrite(RELAY_PIN,LOW);
+ 
   }
 }
 
