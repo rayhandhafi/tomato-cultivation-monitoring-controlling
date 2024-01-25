@@ -48,6 +48,8 @@ int hour=0;
 int minute=0;
 int second=0;
 String rain_status;
+float banyakAir_new = 0.0;
+
 
 
 //Week Days
@@ -137,11 +139,11 @@ void temperature() {
   temp = dht.computeHeatIndex(t, h, false);
 //   Serial.print(temp);
 //   Serial.print(F("°C "));
-  // if (temp < 27) {
-  //   relayPin = 1;
-  // } else if (temp > 30) {
-  //   relayPin = 0;
-  };
+  if (temp > 32) {
+    relayPin = 1;
+  } else if (temp < 27) {
+    relayPin = 0;
+  }
 }
 
 
@@ -177,9 +179,6 @@ void schedule(){
 
 void penyiraman(){
   int relayPin = digitalRead(RELAY_PIN);
-  float banyakAir;
-  float banyakAir_new = 0.0;
-  float water_out;
   // Baca sensor untuk mendeteksi awal penggunaan
   if (relayPin == 1) {
     delay(1000);  // Penghitungan detik penyiram menyala
@@ -187,12 +186,13 @@ void penyiraman(){
   }
 
    banyakAir = (activeTime) * literPerDetik;  // Hitung banyaknya air dalam liter
-   // Serial.printf("Debit air: %.2f\n", banyakAir);
+   Serial.printf("Debit air: %.2f\n", banyakAir);
 
   // Baca sensor untuk mendeteksi akhir penggunaan
   if (relayPin == 0) {
     water_out = banyakAir + banyakAir_new;
     banyakAir_new = banyakAir;
+    activeTime = 0;
   }
 }
 
