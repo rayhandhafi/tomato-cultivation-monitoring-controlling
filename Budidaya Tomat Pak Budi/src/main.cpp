@@ -68,6 +68,7 @@ void schedule();
 void penyiraman();
 void delayOneDay();
 void sendData1();
+void relay();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -97,6 +98,7 @@ void loop() {
   rain();
   schedule();
   penyiraman();
+  relay();
   Blynk.run();
   timer.run();
   
@@ -143,13 +145,13 @@ void temperature() {
   temp = dht.computeHeatIndex(t, h, false);
 //   Serial.print(temp);
 //   Serial.print(F("°C "));
-  if (temp > 40) {
-    relayPin = 1;
-    digitalWrite(RELAY_PIN,HIGH);
-  } else if (temp < 36) {
-    relayPin = 0;
-    digitalWrite(RELAY_PIN,LOW);
-  }
+  // if (temp > 40) {
+  //   relayPin = 1;
+  //   digitalWrite(RELAY_PIN,HIGH);
+  // } else if (temp < 36) {
+  //   relayPin = 0;
+  //   digitalWrite(RELAY_PIN,LOW);
+  // }
 }
 
 
@@ -214,6 +216,14 @@ void penyiraman(){
 void delayOneDay(){
   Serial.println("Delaying one day...");
   delay( 86400000 );
+}
+
+void relay(){
+  if(relayPin==1){
+    digitalWrite(RELAY_PIN,HIGH);
+  }else if(relayPin==0){
+    digitalWrite(RELAY_PIN,LOW);
+  }
 }
 
 void sendData1(){
