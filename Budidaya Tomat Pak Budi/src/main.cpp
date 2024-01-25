@@ -139,11 +139,13 @@ void temperature() {
   temp = dht.computeHeatIndex(t, h, false);
 //   Serial.print(temp);
 //   Serial.print(F("°C "));
-  if (temp > 32) {
-    relayPin = 1;
-  } else if (temp < 27) {
-    relayPin = 0;
-  }
+  // if (temp > 32) {
+  //   relayPin = 1;
+  //   digitalWrite(RELAY_PIN,HIGH);
+  // } else if (temp < 27) {
+  //   relayPin = 0;
+  //   digitalWrite(RELAY_PIN,LOW);
+  // }
 }
 
 
@@ -167,9 +169,11 @@ void schedule(){
     // Serial.println("Scheduling Status: ON");
     if (currentHour == hour && currentMinute == minute && currentSecond == second){
       relayPin = 1;
+      digitalWrite(RELAY_PIN,HIGH);
     }
     else if (currentHour == hour && currentMinute == minute && currentSecond == second+3){
       relayPin = 0;
+      digitalWrite(RELAY_PIN,LOW);
     }
   }
 //   else{
@@ -178,9 +182,9 @@ void schedule(){
 }
 
 void penyiraman(){
-  int relayPin = digitalRead(RELAY_PIN);
   // Baca sensor untuk mendeteksi awal penggunaan
   if (relayPin == 1) {
+    digitalWrite(RELAY_PIN,HIGH);
     delay(1000);  // Penghitungan detik penyiram menyala
     activeTime++;
   }
@@ -193,6 +197,7 @@ void penyiraman(){
     water_out = banyakAir + banyakAir_new;
     banyakAir_new = banyakAir;
     activeTime = 0;
+    digitalWrite(RELAY_PIN,LOW);
   }
 }
 
