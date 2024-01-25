@@ -45,6 +45,9 @@ int relayPin=0;
 float temp=0.0;
 int schedPin = 0;
 String rain_status;
+int currentHour 
+int currentMinute 
+int currentSecond 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Ubah jam
@@ -123,9 +126,9 @@ void time(){
   Serial.print("Formatted Time: ");
   Serial.println(formattedTime);
 */
-  int currentHour = timeClient.getHours();
-  int currentMinute = timeClient.getMinutes();
-  int currentSecond = timeClient.getSeconds();
+  currentHour = timeClient.getHours();
+  currentMinute = timeClient.getMinutes();
+  currentSecond = timeClient.getSeconds();
   String weekDay = weekDays[timeClient.getDay()];
   Serial.printf("Day, Hour:Minutes:Seconds  ->  %s,\t%d:%d:%d \n", weekDay, currentHour, currentMinute, currentSecond);
 }
@@ -163,9 +166,6 @@ void rain(){
 }
 
 void schedule(){
-  int currentHour = timeClient.getHours();
-  int currentMinute = timeClient.getMinutes();
-  int currentSecond = timeClient.getSeconds();
   if(schedPin == 1){
     // Serial.println("Scheduling Status: ON");
     if (currentHour == hour && currentMinute == minute && currentSecond == second){
