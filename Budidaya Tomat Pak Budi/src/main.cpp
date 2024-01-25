@@ -44,10 +44,13 @@ int RELAYPIN=0;
 int relayPin=0;
 float temp=0.0;
 int schedPin = 0;
+String rain_status;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ubah jam
 int hour=0;
 int minute=0;
 int second=0;
-String rain_status;
 
 
 
@@ -138,13 +141,13 @@ void temperature() {
   temp = dht.computeHeatIndex(t, h, false);
 //   Serial.print(temp);
 //   Serial.print(F("°C "));
-  // if (temp > 32) {
-  //   relayPin = 1;
-  //   digitalWrite(RELAY_PIN,HIGH);
-  // } else if (temp < 27) {
-  //   relayPin = 0;
-  //   digitalWrite(RELAY_PIN,LOW);
-  // }
+  if (temp > 40) {
+    relayPin = 1;
+    digitalWrite(RELAY_PIN,HIGH);
+  } else if (temp < 36) {
+    relayPin = 0;
+    digitalWrite(RELAY_PIN,LOW);
+  }
 }
 
 
@@ -197,7 +200,7 @@ void penyiraman(){
   
   // Hitung banyaknya air dalam liter
    banyakAir = activeTime * literPerDetik;  
-   Serial.printf("Debit air: %.2f\n", banyakAir);
+   // Serial.printf("Debit air: %.2f\n", banyakAir);
 
   // Baca sensor untuk mendeteksi akhir penggunaan
   if (relayPin == 0) {
