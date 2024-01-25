@@ -118,7 +118,7 @@ void time(){
   int currentMinute = timeClient.getMinutes();
   int currentSecond = timeClient.getSeconds();
   String weekDay = weekDays[timeClient.getDay()];
-  Serial.printf("Day, Hour:Minutes:Seconds  ->  %s,\t%d:%d:%d \n", weekDay, currentHour, currentMinute, currentSecond);
+  // Serial.printf("Day, Hour:Minutes:Seconds  ->  %s,\t%d:%d:%d \n", weekDay, currentHour, currentMinute, currentSecond);
 }
 
 void temperature() {
@@ -206,7 +206,7 @@ void sendData1(){
     Blynk.virtualWrite(V4, relayPin); 
 
     Serial.printf("Rain status: %s\n", rain_status);
-    Blynk.virtualWrite(V3, rain_value);
+    Blynk.virtualWrite(V3, rain_status);
 
     Serial.printf("Sched_Pin status: %d\n", schedPin);
 
