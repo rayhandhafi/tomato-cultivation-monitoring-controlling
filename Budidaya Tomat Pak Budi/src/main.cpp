@@ -90,7 +90,6 @@ void loop() {
   if(relayPin == 0){
     time(); 
   }
-  time(); 
   temperature();
   rain();
   schedule();
