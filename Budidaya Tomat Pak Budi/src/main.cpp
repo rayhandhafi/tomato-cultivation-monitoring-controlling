@@ -45,17 +45,17 @@ int relayPin=0;
 float temp=0.0;
 int schedPin = 0;
 String rain_status;
-int currentHour;
-int currentMinute; 
+
+int schedHour ;
+int schedMinute ; 
+int schedSecond ;
+
+int timeInput;
+int currentHour ;
+int currentMinute;
 int currentSecond;
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// Ubah jam
-int hour=0;
-int minute=0;
-int second=0;
-
-
+String timeLabel;
 
 //Week Days
 String weekDays[7]={"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
@@ -69,6 +69,7 @@ void penyiraman();
 void delayOneDay();
 void sendData1();
 void relay();
+void konversiWaktu();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -119,9 +120,27 @@ BLYNK_WRITE(V4){
    relayPin = param.asInt();
 }
 
+BLYNK_WRITE(V5){
+    timeInput= param.asInt();
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+void konversiWaktu(){
+  int jam = timeInput / 3600;
+  int sisaDetik = timeInput % 3600;
+  int menit = sisaDetik / 60;
+  int detikSisa = sisaDetik % 60;
+
+  // Menampilkan hasil
+  schedHour = jam;
+  schedMinute = menit;
+  schedSecond = detikSisa;
+}
+
 void time(){
+  konversiWaktu();
   timeClient.update();
 /*
   String formattedTime = timeClient.getFormattedTime();
@@ -169,11 +188,12 @@ void rain(){
 void schedule(){
   if(schedPin == 1){
     // Serial.println("Scheduling Status: ON");
-    if (currentHour == hour && currentMinute == minute && currentSecond == second){
+    timeLabel = String(schedHour) + " : " +  String(schedMinute) + " : " + String(schedSecond);
+    if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond){
       relayPin = 1;
       digitalWrite(RELAY_PIN,HIGH);
     }
-    else if (currentHour == hour && currentMinute == minute && currentSecond == second+10){
+    else if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond+10){
       relayPin = 0;
       digitalWrite(RELAY_PIN,LOW);
     }
@@ -243,4 +263,6 @@ void sendData1(){
     Serial.printf("Banyak Air status: %0.2f\n", water_out);
     Blynk.virtualWrite(V1, water_out);
 
+    Serial.printf("Waktu Penjadwalan, Hour:Minutes:Seconds  ->  %s", timeLabel;
+    Blynk.virtualWrite(V6, timeLabel);
 }
