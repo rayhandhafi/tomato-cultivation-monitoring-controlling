@@ -1,9 +1,11 @@
 #include <Arduino.h>
 
+
 #define BLYNK_PRINT Serial
 #define BLYNK_TEMPLATE_ID "TMPL6j7BPqVJ8"
 #define BLYNK_TEMPLATE_NAME "Weather Station"
 #define BLYNK_AUTH_TOKEN "LhvG059ul4tBGOPUH3IZT3VUlR9h77M8"
+
 
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
@@ -11,7 +13,6 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <BlynkSimpleEsp32.h>
-
 
 
 #define TEMP_PIN 25                          
@@ -22,7 +23,6 @@
 #define RELAY_PIN 15
 #define SCHED_PIN 33
 #define DHTTYPE DHT22
-
 
 
 // calculate debit water
@@ -40,6 +40,7 @@ const char *password = "12345678";
 int rain_value =0;
 float banyakAir=0;
 float water_out=0;
+
 int RELAYPIN=0;
 int relayPin=0;
 float temp=0.0;
@@ -51,9 +52,16 @@ int schedMinute ;
 int schedSecond ;
 
 int timeInput;
-int currentHour ;
-int currentMinute;
+int currentHour;
+int currentMinute; 
 int currentSecond;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ubah jam
+int hour=0;
+int minute=0;
+int second=0;
+
 
 String timeLabel;
 
@@ -69,10 +77,8 @@ void penyiraman();
 void delayOneDay();
 void sendData1();
 void relay();
-void konversiWaktu();
-
+void konversiWaktu();                                                                               
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 void setup(){
   Serial.begin(115200);
@@ -110,8 +116,6 @@ void loop() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 BLYNK_WRITE(V2){
    schedPin = param.asInt();
 } 
@@ -122,10 +126,8 @@ BLYNK_WRITE(V4){
 
 BLYNK_WRITE(V5){
     timeInput= param.asInt();
-}
+}                                              
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 void konversiWaktu(){
   int jam = timeInput / 3600;
@@ -167,7 +169,7 @@ void temperature() {
   if (temp > 40) {
     relayPin = 1;
     digitalWrite(RELAY_PIN,HIGH);
-  } else if ((temp <= 36)&&(temp >=35.99)) {
+  } else if ((temp > 35)&&(temp < 36)) {
     relayPin = 0;
     digitalWrite(RELAY_PIN,LOW);
   }
@@ -182,18 +184,16 @@ void rain(){
   }else{
     rain_status = "Cerah";
   }
-
 }
 
 void schedule(){
   if(schedPin == 1){
     // Serial.println("Scheduling Status: ON");
-    timeLabel = String(schedHour) + " : " +  String(schedMinute) + " : " + String(schedSecond);
-    if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond){
+    if (currentHour == hour && currentMinute == minute && currentSecond == second){
       relayPin = 1;
       digitalWrite(RELAY_PIN,HIGH);
     }
-    else if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond+10){
+    else if (currentHour == hour && currentMinute == minute && currentSecond == second+10){
       relayPin = 0;
       digitalWrite(RELAY_PIN,LOW);
     }
@@ -228,7 +228,6 @@ void penyiraman(){
     // Tampilkan hasil pada monitor serial
     // Serial.printf("Banyaknya Air yang Keluar: %.6f Liter", water_out);
     activeTime = 0;
- 
   }
 }
 
@@ -263,6 +262,6 @@ void sendData1(){
     Serial.printf("Banyak Air status: %0.2f\n", water_out);
     Blynk.virtualWrite(V1, water_out);
 
-    Serial.printf("Waktu Penjadwalan, Hour:Minutes:Seconds  ->  %s", timeLabel;
+    Serial.printf("Waktu Penjadwalan, Hour:Minutes:Seconds  ->  %s", timeLabel);
     Blynk.virtualWrite(V6, timeLabel);
 }
