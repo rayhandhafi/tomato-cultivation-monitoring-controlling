@@ -139,6 +139,8 @@ void konversiWaktu(){
   schedHour = jam;
   schedMinute = menit;
   schedSecond = detikSisa;
+
+  timeLabel = String(schedHour) + ":" + String(schedMinute) + ":" + String(schedSecond)
 }
 
 void time(){
@@ -189,11 +191,11 @@ void rain(){
 void schedule(){
   if(schedPin == 1){
     // Serial.println("Scheduling Status: ON");
-    if (currentHour == hour && currentMinute == minute && currentSecond == second){
+    if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond){
       relayPin = 1;
       digitalWrite(RELAY_PIN,HIGH);
     }
-    else if (currentHour == hour && currentMinute == minute && currentSecond == second+10){
+    else if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond+10){
       relayPin = 0;
       digitalWrite(RELAY_PIN,LOW);
     }
