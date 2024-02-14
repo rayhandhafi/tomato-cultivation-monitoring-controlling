@@ -62,6 +62,8 @@ int hour=0;
 int minute=0;
 int second=0;
 
+int batas =0;
+
 
 String timeLabel;
 
@@ -196,6 +198,7 @@ void schedule(){
     if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond){
       relayPin = 1;
       digitalWrite(RELAY_PIN,HIGH);
+      batas = 10;
     }
     else if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond+10){
       relayPin = 0;
@@ -210,21 +213,22 @@ void schedule(){
 void penyiraman(){
   // Baca sensor untuk mendeteksi awal penggunaan
   float banyakAir_new = 0.0;
-  
-  int currentHour = timeClient.getHours();
-  int currentMinute = timeClient.getMinutes();
-  int currentSecond = timeClient.getSeconds();
-
+  int sched = 0;
   // Baca sensor untuk mendeteksi awal penggunaan
   if (relayPin == 1) {
     delay(1000);  // Penghitungan detik penyiram menyala
     ++activeTime;
+    if(schedPin == 1){
+      ++sched;
+    }
   }
   
   // Hitung banyaknya air dalam liter
    banyakAir = activeTime * literPerDetik;  
    // Serial.printf("Debit air: %.2f\n", banyakAir);
-
+  if(sched==batas){
+    relayPin = 0;
+  }
   // Baca sensor untuk mendeteksi akhir penggunaan
   if (relayPin == 0) {
     water_out += banyakAir;
@@ -256,7 +260,7 @@ void sendData1(){
     Blynk.virtualWrite(V0, temp); 
 
     Serial.printf("Relay Value: %d  \n", relayPin);
-    // Blynk.virtualWrite(V4, relayPin); 
+    Blynk.virtualWrite(V4, relayPin); 
 
     Serial.printf("Rain status: %s\n", rain_status);
     Blynk.virtualWrite(V3, rain_status);
