@@ -265,7 +265,7 @@ void sendData1(){
     Blynk.virtualWrite(V0, temp); 
 
     Serial.printf("Relay Value: %d  \n", relayPin);
-    Blynk.virtualWrite(V4, relayPin); 
+    Blynk.virtualWrite(V7, relayPin); 
 
     Serial.printf("Rain status: %s\n", rain_status);
     Blynk.virtualWrite(V3, rain_status);
