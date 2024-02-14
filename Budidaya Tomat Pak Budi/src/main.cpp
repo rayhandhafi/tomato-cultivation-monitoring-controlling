@@ -228,6 +228,7 @@ void penyiraman(){
    // Serial.printf("Debit air: %.2f\n", banyakAir);
   if(sched==batas){
     relayPin = 0;
+    batas = 0;
   }
   // Baca sensor untuk mendeteksi akhir penggunaan
   if (relayPin == 0) {
