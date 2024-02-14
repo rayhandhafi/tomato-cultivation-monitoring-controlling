@@ -28,6 +28,7 @@
 // calculate debit water
 const float literPerDetik = 0.0666666666666;  // Debit air dalam liter per detik
 int activeTime;  // Waktu penyiraman dalam detik
+int sched;
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "id.pool.ntp.org", 25200, 60000);
@@ -64,6 +65,7 @@ int second=0;
 
 int batas =0;
 
+bool scheduleStatus = false;
 
 String timeLabel;
 
@@ -198,6 +200,7 @@ void schedule(){
     if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond){
       relayPin = 1;
       digitalWrite(RELAY_PIN,HIGH);
+      scheduleStatus = true;
       batas = 10;
     }
     else if (currentHour == schedHour && currentMinute == schedMinute && currentSecond == schedSecond+10){
@@ -213,12 +216,11 @@ void schedule(){
 void penyiraman(){
   // Baca sensor untuk mendeteksi awal penggunaan
   float banyakAir_new = 0.0;
-  int sched = 0;
   // Baca sensor untuk mendeteksi awal penggunaan
   if (relayPin == 1) {
     delay(1000);  // Penghitungan detik penyiram menyala
     ++activeTime;
-    if(schedPin == 1){
+    if(scheduleStatus){
       ++sched;
     }
   }
@@ -229,6 +231,8 @@ void penyiraman(){
   if(sched==batas){
     relayPin = 0;
     batas = 0;
+    sched = 0;
+    scheduleStatus = false;
   }
   // Baca sensor untuk mendeteksi akhir penggunaan
   if (relayPin == 0) {
