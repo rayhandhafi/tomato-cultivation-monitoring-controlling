@@ -98,7 +98,9 @@ void setup(){
 }
 
 void loop() { 
-  time(); 
+  if(relayPin == 0){
+    time(); 
+  }
   konversiWaktu();
   temperature();
   rain();
@@ -125,7 +127,8 @@ BLYNK_WRITE(V4){
 
 BLYNK_WRITE(V5){
     timeInput= param.asInt();
-}                                              
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void konversiWaktu(){
