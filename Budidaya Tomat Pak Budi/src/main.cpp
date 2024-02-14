@@ -228,7 +228,7 @@ void penyiraman(){
   // Hitung banyaknya air dalam liter
    banyakAir = activeTime * literPerDetik;  
    // Serial.printf("Debit air: %.2f\n", banyakAir);
-  if(sched==batas){
+  if(sched==batas && sched !=0 && batas !=0){
     relayPin = 0;
     batas = 0;
     sched = 0;
