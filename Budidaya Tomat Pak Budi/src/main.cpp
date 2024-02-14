@@ -101,6 +101,7 @@ void loop() {
   if(relayPin == 0){
     time(); 
   }
+  konversiWaktu();
   temperature();
   rain();
   schedule();
@@ -144,7 +145,7 @@ void konversiWaktu(){
 }
 
 void time(){
-  konversiWaktu();
+
   timeClient.update();
 /*
   String formattedTime = timeClient.getFormattedTime();
@@ -264,6 +265,6 @@ void sendData1(){
     Serial.printf("Banyak Air status: %0.2f\n", water_out);
     Blynk.virtualWrite(V1, water_out);
 
-    Serial.printf("Waktu Penjadwalan, Hour:Minutes:Seconds  ->  %s", timeLabel);
+    Serial.printf("Waktu Penjadwalan, Hour:Minutes:Seconds  ->  %s \n", timeLabel);
     Blynk.virtualWrite(V6, timeLabel);
 }
