@@ -98,9 +98,7 @@ void setup(){
 }
 
 void loop() { 
-  if(relayPin == 0){
-    time(); 
-  }
+  time(); 
   konversiWaktu();
   temperature();
   rain();
@@ -141,7 +139,7 @@ void konversiWaktu(){
   schedMinute = menit;
   schedSecond = detikSisa;
 
-  timeLabel = String(schedHour) + ":" + String(schedMinute) + ":" + String(schedSecond)
+  timeLabel = String(schedHour) + ":" + String(schedMinute) + ":" + String(schedSecond);
 }
 
 void time(){
